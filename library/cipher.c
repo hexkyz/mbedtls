@@ -147,8 +147,8 @@ void mbedtls_cipher_free( mbedtls_cipher_context_t *ctx )
 #endif
 
 #if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
-	if( ctx->tweak_ctx )
-		ctx->cipher_info->base->ctx_free_func( ctx->tweak_ctx );
+    if( ctx->tweak_ctx )
+        ctx->cipher_info->base->ctx_free_func( ctx->tweak_ctx );
 #endif
 
     if( ctx->cipher_ctx )
@@ -168,8 +168,8 @@ int mbedtls_cipher_setup( mbedtls_cipher_context_t *ctx, const mbedtls_cipher_in
         return( MBEDTLS_ERR_CIPHER_ALLOC_FAILED );
 	
 #if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
-	if( NULL == ( ctx->tweak_ctx = cipher_info->base->ctx_alloc_func() ) )
-		return( MBEDTLS_ERR_CIPHER_ALLOC_FAILED );
+    if( NULL == ( ctx->tweak_ctx = cipher_info->base->ctx_alloc_func() ) )
+        return( MBEDTLS_ERR_CIPHER_ALLOC_FAILED );
 #endif
 
     ctx->cipher_info = cipher_info;
@@ -201,9 +201,9 @@ int mbedtls_cipher_setkey( mbedtls_cipher_context_t *ctx, const unsigned char *k
     }
 	
 #if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
-	if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
-		MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
-		key_bitlen /= 2;
+    if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
+        MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
+        key_bitlen /= 2;
 #endif
 
     ctx->key_bitlen = key_bitlen;
@@ -217,10 +217,10 @@ int mbedtls_cipher_setkey( mbedtls_cipher_context_t *ctx, const unsigned char *k
         MBEDTLS_MODE_CTR == ctx->cipher_info->mode )
     {
 #if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
-		if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
-			MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
-			ctx->cipher_info->base->setkey_enc_func( ctx->tweak_ctx, key + key_bitlen / 8,
-					ctx->key_bitlen );
+        if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
+            MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
+            ctx->cipher_info->base->setkey_enc_func( ctx->tweak_ctx, key + key_bitlen / 8,
+                    ctx->key_bitlen );
 #endif		
         return ctx->cipher_info->base->setkey_enc_func( ctx->cipher_ctx, key,
                 ctx->key_bitlen );
@@ -229,10 +229,10 @@ int mbedtls_cipher_setkey( mbedtls_cipher_context_t *ctx, const unsigned char *k
     if( MBEDTLS_DECRYPT == operation )
 	{
 #if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
-		if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
-			MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
-			ctx->cipher_info->base->setkey_enc_func( ctx->tweak_ctx, key + key_bitlen / 8,
-					ctx->key_bitlen );
+        if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
+            MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
+            ctx->cipher_info->base->setkey_enc_func( ctx->tweak_ctx, key + key_bitlen / 8,
+                   ctx->key_bitlen );
 #endif
         return ctx->cipher_info->base->setkey_dec_func( ctx->cipher_ctx, key,
                 ctx->key_bitlen );
@@ -481,7 +481,7 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
     if( ctx->cipher_info->mode == MBEDTLS_MODE_XEX )
     {
         if( 0 != ( ret = ctx->cipher_info->base->xex_func( ctx->cipher_ctx,
-				ctx->tweak_ctx, ctx->operation, ilen, ctx->iv,
+                ctx->tweak_ctx, ctx->operation, ilen, ctx->iv,
                 input, output ) ) )
         {
             return( ret );
@@ -497,7 +497,7 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
     if( ctx->cipher_info->mode == MBEDTLS_MODE_XTS )
     {
         if( 0 != ( ret = ctx->cipher_info->base->xts_func( ctx->cipher_ctx,
-				ctx->tweak_ctx, ctx->operation, ilen, ctx->iv,
+                ctx->tweak_ctx, ctx->operation, ilen, ctx->iv,
                 input, output ) ) )
         {
             return( ret );

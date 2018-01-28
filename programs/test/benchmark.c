@@ -95,7 +95,7 @@ int main( void )
     "md4, md5, ripemd160, sha1, sha256, sha512,\n"                      \
     "arc4, des3, des, camellia, blowfish,\n"                            \
     "aes_cbc, aes_xex, aes_xts, aes_gcm, aes_ccm,\n" 					\
-	"aes_cmac, des3_cmac, havege, ctr_drbg, hmac_drbg\n"                \
+    "aes_cmac, des3_cmac, havege, ctr_drbg, hmac_drbg\n"                \
     "rsa, dhm, ecdsa, ecdh.\n"
 
 #if defined(MBEDTLS_ERROR_C)
@@ -283,10 +283,10 @@ int main( int argc, char *argv[] )
                 todo.des = 1;
             else if( strcmp( argv[i], "aes_cbc" ) == 0 )
                 todo.aes_cbc = 1;
-			else if( strcmp( argv[i], "aes_xex" ) == 0 )
+            else if( strcmp( argv[i], "aes_xex" ) == 0 )
                 todo.aes_xex = 1;
             else if( strcmp( argv[i], "aes_xts" ) == 0 )
-				todo.aes_xts = 1;
+                todo.aes_xts = 1;
             else if( strcmp( argv[i], "aes_gcm" ) == 0 )
                 todo.aes_gcm = 1;
             else if( strcmp( argv[i], "aes_ccm" ) == 0 )

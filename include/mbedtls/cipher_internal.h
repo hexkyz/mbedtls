@@ -73,15 +73,15 @@ struct mbedtls_cipher_base_t
 #if defined(MBEDTLS_CIPHER_MODE_XEX)
     /** Encrypt using XEX */
     int (*xex_func)( void *ctx, void *tweak_ctx, mbedtls_operation_t mode, 
-						size_t length, unsigned char *iv, const unsigned char *input,
-						unsigned char *output );
+                     size_t length, unsigned char *iv, const unsigned char *input,
+                     unsigned char *output );
 #endif
 
 #if defined(MBEDTLS_CIPHER_MODE_XTS)
     /** Encrypt using XTS */
     int (*xts_func)( void *ctx, void *tweak_ctx, mbedtls_operation_t mode, 
-						size_t length, unsigned char *iv, const unsigned char *input,
-						unsigned char *output );
+                     size_t length, unsigned char *iv, const unsigned char *input,
+                     unsigned char *output );
 #endif
 
 #if defined(MBEDTLS_CIPHER_MODE_STREAM)

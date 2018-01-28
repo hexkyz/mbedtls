@@ -153,7 +153,7 @@ static int aes_crypt_xex_wrap( void *ctx, void *tweak_ctx, mbedtls_operation_t o
 		size_t length, unsigned char *iv, const unsigned char *input, unsigned char *output )
 {
     return mbedtls_aes_crypt_xex( (mbedtls_aes_context *) ctx, (mbedtls_aes_context *) tweak_ctx,
-						  operation, length, iv, input, output );
+                          operation, length, iv, input, output );
 }
 #endif /* MBEDTLS_CIPHER_MODE_XEX */
 
@@ -162,7 +162,7 @@ static int aes_crypt_xts_wrap( void *ctx, void *tweak_ctx, mbedtls_operation_t o
 		size_t length, unsigned char *iv, const unsigned char *input, unsigned char *output )
 {
     return mbedtls_aes_crypt_xts( (mbedtls_aes_context *) ctx, (mbedtls_aes_context *) tweak_ctx,
-						  operation, length, iv, input, output );
+                          operation, length, iv, input, output );
 }
 #endif /* MBEDTLS_CIPHER_MODE_XTS */
 
