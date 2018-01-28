@@ -146,6 +146,11 @@ void mbedtls_cipher_free( mbedtls_cipher_context_t *ctx )
     }
 #endif
 
+#if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
+	if( ctx->tweak_ctx )
+		ctx->cipher_info->base->ctx_free_func( ctx->tweak_ctx );
+#endif
+
     if( ctx->cipher_ctx )
         ctx->cipher_info->base->ctx_free_func( ctx->cipher_ctx );
 
@@ -161,6 +166,11 @@ int mbedtls_cipher_setup( mbedtls_cipher_context_t *ctx, const mbedtls_cipher_in
 
     if( NULL == ( ctx->cipher_ctx = cipher_info->base->ctx_alloc_func() ) )
         return( MBEDTLS_ERR_CIPHER_ALLOC_FAILED );
+	
+#if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
+	if( NULL == ( ctx->tweak_ctx = cipher_info->base->ctx_alloc_func() ) )
+		return( MBEDTLS_ERR_CIPHER_ALLOC_FAILED );
+#endif
 
     ctx->cipher_info = cipher_info;
 
@@ -189,6 +199,12 @@ int mbedtls_cipher_setkey( mbedtls_cipher_context_t *ctx, const unsigned char *k
     {
         return( MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA );
     }
+	
+#if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
+	if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
+		MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
+		key_bitlen /= 2;
+#endif
 
     ctx->key_bitlen = key_bitlen;
     ctx->operation = operation;
@@ -200,14 +216,27 @@ int mbedtls_cipher_setkey( mbedtls_cipher_context_t *ctx, const unsigned char *k
         MBEDTLS_MODE_CFB == ctx->cipher_info->mode ||
         MBEDTLS_MODE_CTR == ctx->cipher_info->mode )
     {
+#if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
+		if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
+			MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
+			ctx->cipher_info->base->setkey_enc_func( ctx->tweak_ctx, key + key_bitlen / 8,
+					ctx->key_bitlen );
+#endif		
         return ctx->cipher_info->base->setkey_enc_func( ctx->cipher_ctx, key,
                 ctx->key_bitlen );
     }
 
     if( MBEDTLS_DECRYPT == operation )
+	{
+#if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
+		if( MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
+			MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
+			ctx->cipher_info->base->setkey_enc_func( ctx->tweak_ctx, key + key_bitlen / 8,
+					ctx->key_bitlen );
+#endif
         return ctx->cipher_info->base->setkey_dec_func( ctx->cipher_ctx, key,
                 ctx->key_bitlen );
-
+	}
     return( MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA );
 }
 
@@ -448,6 +477,38 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
     }
 #endif /* MBEDTLS_CIPHER_MODE_STREAM */
 
+#if defined(MBEDTLS_CIPHER_MODE_XEX)
+    if( ctx->cipher_info->mode == MBEDTLS_MODE_XEX )
+    {
+        if( 0 != ( ret = ctx->cipher_info->base->xex_func( ctx->cipher_ctx,
+				ctx->tweak_ctx, ctx->operation, ilen, ctx->iv,
+                input, output ) ) )
+        {
+            return( ret );
+        }
+
+        *olen = ilen;
+
+        return( 0 );
+    }
+#endif /* MBEDTLS_CIPHER_MODE_XEX */
+
+#if defined(MBEDTLS_CIPHER_MODE_XTS)
+    if( ctx->cipher_info->mode == MBEDTLS_MODE_XTS )
+    {
+        if( 0 != ( ret = ctx->cipher_info->base->xts_func( ctx->cipher_ctx,
+				ctx->tweak_ctx, ctx->operation, ilen, ctx->iv,
+                input, output ) ) )
+        {
+            return( ret );
+        }
+
+        *olen = ilen;
+
+        return( 0 );
+    }
+#endif /* MBEDTLS_CIPHER_MODE_XTS */
+
     return( MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE );
 }
 
@@ -634,7 +695,9 @@ int mbedtls_cipher_finish( mbedtls_cipher_context_t *ctx,
     if( MBEDTLS_MODE_CFB == ctx->cipher_info->mode ||
         MBEDTLS_MODE_CTR == ctx->cipher_info->mode ||
         MBEDTLS_MODE_GCM == ctx->cipher_info->mode ||
-        MBEDTLS_MODE_STREAM == ctx->cipher_info->mode )
+        MBEDTLS_MODE_STREAM == ctx->cipher_info->mode || 
+		MBEDTLS_MODE_XEX == ctx->cipher_info->mode ||
+		MBEDTLS_MODE_XTS == ctx->cipher_info->mode)
     {
         return( 0 );
     }

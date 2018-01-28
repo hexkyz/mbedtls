@@ -127,6 +127,12 @@ typedef enum {
     MBEDTLS_CIPHER_CAMELLIA_128_CCM,
     MBEDTLS_CIPHER_CAMELLIA_192_CCM,
     MBEDTLS_CIPHER_CAMELLIA_256_CCM,
+	MBEDTLS_CIPHER_AES_128_XEX,
+    MBEDTLS_CIPHER_AES_192_XEX,
+    MBEDTLS_CIPHER_AES_256_XEX,
+	MBEDTLS_CIPHER_AES_128_XTS,
+    MBEDTLS_CIPHER_AES_192_XTS,
+    MBEDTLS_CIPHER_AES_256_XTS,
 } mbedtls_cipher_type_t;
 
 typedef enum {
@@ -139,6 +145,8 @@ typedef enum {
     MBEDTLS_MODE_GCM,
     MBEDTLS_MODE_STREAM,
     MBEDTLS_MODE_CCM,
+	MBEDTLS_MODE_XEX,
+	MBEDTLS_MODE_XTS,
 } mbedtls_cipher_mode_t;
 
 typedef enum {
@@ -246,6 +254,11 @@ typedef struct {
 
     /** Cipher-specific context */
     void *cipher_ctx;
+	
+#if defined(MBEDTLS_CIPHER_MODE_XEX) || defined(MBEDTLS_CIPHER_MODE_XTS)
+    /** XEX/XTS Tweak context */
+    void *tweak_ctx;
+#endif
 
 #if defined(MBEDTLS_CMAC_C)
     /** CMAC Specific context */
